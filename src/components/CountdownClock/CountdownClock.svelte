@@ -1,6 +1,5 @@
 <script>
   import ProgressBar from 'progressbar.js';
-  import { fade } from 'svelte/transition';
   import { tick } from 'svelte';
   import differenceInMilliseconds from 'date-fns/differenceInMilliseconds';
   import isBefore from 'date-fns/isBefore';
