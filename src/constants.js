@@ -1,5 +1,5 @@
 export const POMO_DURATIONS = {
-  work: 5,
-  shortPause: 1 * 60,
-  longPause: 2 * 60,
+  work: 25 * 60,
+  shortBreak: 5 * 60,
+  longBreak: 20 * 60,
 };
