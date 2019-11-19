@@ -25,8 +25,7 @@
       throw new Error('Unknown cycle type');
     }
 
-    return minutes;
-    /* return minutes * 60; */
+    return minutes * 60;
   }
 
   function requestNotificationPermission() {
