@@ -1,7 +1,15 @@
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 
 export function formatRemainingTime(countdownTime) {
-  const secondsDifference = differenceInSeconds(countdownTime, new Date())
+  return formatTimeDifference(new Date(), countdownTime)
+}
+
+export function formatTimeDifference(t1, t2) {
+  const secondsDifference = differenceInSeconds(t2, t1)
+  return formatSecondsDifference(secondsDifference)
+}
+
+function formatSecondsDifference(secondsDifference) {
   const hours = Math.floor(Math.abs(secondsDifference) / 3600)
   const minutes = Math.floor((Math.abs(secondsDifference) % 3600) / 60)
   const seconds = (Math.abs(secondsDifference) % 3600) % 60
@@ -14,7 +22,7 @@ export function formatRemainingTime(countdownTime) {
 }
 
 export function formatNumberToTwoDigits(number) {
-  if (number < 9) {
+  if (number <= 9) {
     return `0${number}`
   }
 

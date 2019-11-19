@@ -1,20 +1,44 @@
 <script>
   import settings from '../../stores/settings.js'
   import addSeconds from 'date-fns/addSeconds'
+  import differenceInSeconds from 'date-fns/differenceInSeconds'
   import { tick, onMount, getContext } from 'svelte'
   import { fade } from 'svelte/transition'
-  import Settings from '../../components/Settings/Settings.svelte'
-  import CountdownClock from '../../components/CountdownClock/CountdownClock.svelte'
+  import Settings from '../Settings/Settings.svelte'
+  import CountdownClock from '../CountdownClock/CountdownClock.svelte'
+  import Stopwatch from '../Stopwatch/Stopwatch.svelte'
 
   let pomoCycleCompleted = false
-  let cyclesCompletedBeforeLongBreak = 0
   let pomoCycleType = null
   let pomoCycleCountdown = null
   let paused = false
+  let cummulatedWorkTimeInDynamicPomodoroInSecs = 0
+  let currentWorkTimeInDynamicPomodoroInSecs = null
+  let cummulatedBreakTimeInDynamicPomodoroInSecs = 0
   let pomodoroCompletedSound
+  let dynamicPomoCycleStartingPoint = null
 
   function getDurationByCycleType(cycleType) {
+    if ($settings.enableDynamicPomos) {
+      let pauseInSecs = Math.floor(currentWorkTimeInDynamicPomodoroInSecs / 12)
+      if (cycleType === 'shortBreak') {
+        cummulatedBreakTimeInDynamicPomodoroInSecs += pauseInSecs
+      } else if (cycleType === 'longBreak') {
+        cummulatedBreakTimeInDynamicPomodoroInSecs += pauseInSecs
+        pauseInSecs = cummulatedBreakTimeInDynamicPomodoroInSecs
+        cummulatedBreakTimeInDynamicPomodoroInSecs = 0
+        cummulatedWorkTimeInDynamicPomodoroInSecs = 0
+      } else {
+        throw new Error(
+          `Cycle type ${cycleType} is not supported in dynamic pomodoros.`
+        )
+      }
+
+      return pauseInSecs
+    }
+
     let minutes
+
     if (cycleType === 'work') {
       minutes = $settings.workTime
     } else if (cycleType === 'shortBreak') {
@@ -51,12 +75,23 @@
 
     pomoCycleType = cycleType
     pomoCycleCompleted = false
-    pomoCycleCountdown = cycleType
-      ? addSeconds(new Date(), getDurationByCycleType(cycleType))
-      : null
+    if ($settings.enableDynamicPomos && cycleType === 'work') {
+      dynamicPomoCycleStartingPoint = new Date()
+      pomoCycleCountdown = null
+    } else {
+      pomoCycleCountdown = cycleType
+        ? addSeconds(new Date(), getDurationByCycleType(cycleType))
+        : null
+      dynamicPomoCycleStartingPoint = null
+    }
     if (pomodoroCompletedSound) {
       pomodoroCompletedSound.pause()
       pomodoroCompletedSound.currentTime = 0
+    }
+
+    if (cycleType == null) {
+      cummulatedWorkTimeInDynamicPomodoroInSecs = 0
+      cummulatedBreakTimeInDynamicPomodoroInSecs = 0
     }
   }
 
@@ -66,18 +101,28 @@
     }
   }
 
-  function completePomodoro() {
+  function completeTraditionalPomodoro() {
     if (!pomodoroCompletedSound) {
       pomodoroCompletedSound = new Audio('analog-watch-alarm_daniel-simion.mp3')
     }
     pomodoroCompletedSound.play()
     pomoCycleCompleted = true
-    cyclesCompletedBeforeLongBreak += 1
     if (pomoCycleType === 'work') {
       new Notification('Pomodoro finished')
     } else {
       new Notification('Break finished')
     }
+  }
+
+  function completeDynamicWorkingPomodoro(breakCycleType) {
+    pomoCycleCompleted = true
+    currentWorkTimeInDynamicPomodoroInSecs = differenceInSeconds(
+      new Date(),
+      dynamicPomoCycleStartingPoint
+    )
+    cummulatedWorkTimeInDynamicPomodoroInSecs += currentWorkTimeInDynamicPomodoroInSecs
+    dynamicPomoCycleStartingPoint = null
+    startCycle(breakCycleType)
   }
 
   const { open } = getContext('simple-modal')
@@ -113,27 +158,31 @@
 <div class="app-wrapper">
   <div id="countdown-timer-menu">
     <CountdownClock
-      on:complete={completePomodoro}
+      on:complete={completeTraditionalPomodoro}
       on:updateCountdown={({ detail: { time } }) => (pomoCycleCountdown = time)}
       pomodoroCountdown={pomoCycleCountdown}
       {paused} />
-    {#if !pomoCycleCountdown || (pomoCycleType !== 'work' && pomoCycleCompleted)}
+    <Stopwatch
+      startTime={dynamicPomoCycleStartingPoint}
+      {paused}
+      on:updateStartTime={({ detail: { time } }) => (dynamicPomoCycleStartingPoint = time)} />
+    {#if (!pomoCycleCountdown && !dynamicPomoCycleStartingPoint) || (pomoCycleType !== 'work' && pomoCycleCompleted)}
       <button on:click={() => startCycle('work')}>Start Pomodoro</button>
     {/if}
 
-    {#if !pomoCycleCountdown}
+    {#if !pomoCycleCountdown && !dynamicPomoCycleStartingPoint}
       <button on:click={openSettingsModal}>Open Settings</button>
     {/if}
 
-    {#if pomoCycleCountdown && !paused && !pomoCycleCompleted}
+    {#if (pomoCycleCountdown || dynamicPomoCycleStartingPoint) && !paused && !pomoCycleCompleted}
       <button on:click={() => (paused = true)}>Pause</button>
     {/if}
 
-    {#if pomoCycleCountdown && paused && !pomoCycleCompleted}
+    {#if (pomoCycleCountdown || dynamicPomoCycleStartingPoint) && paused && !pomoCycleCompleted}
       <button on:click={() => (paused = false)}>Continue</button>
     {/if}
 
-    {#if pomoCycleCountdown && !pomoCycleCompleted}
+    {#if (pomoCycleCountdown || dynamicPomoCycleStartingPoint) && !pomoCycleCompleted}
       <button on:click={interruptPomodoro}>Cancel Pomodoro</button>
     {/if}
 
@@ -149,6 +198,16 @@
 
     {#if pomoCycleCountdown && pomoCycleCompleted}
       <button on:click={interruptPomodoro}>Stop working</button>
+    {/if}
+
+    {#if dynamicPomoCycleStartingPoint && !pomoCycleCompleted && pomoCycleType === 'work'}
+      <button on:click={() => completeDynamicWorkingPomodoro('shortBreak')}>
+        Complete Work and Make a Short Break
+      </button>
+
+      <button on:click={() => completeDynamicWorkingPomodoro('longBreak')}>
+        Complete Work and Make a Long Break
+      </button>
     {/if}
   </div>
 </div>

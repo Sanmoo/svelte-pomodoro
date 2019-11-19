@@ -4,7 +4,7 @@
   import differenceInMilliseconds from 'date-fns/differenceInMilliseconds'
   import isBefore from 'date-fns/isBefore'
   import addMilliseconds from 'date-fns/addMilliseconds'
-  import { formatRemainingTime } from './utils'
+  import { formatRemainingTime } from '../../utils/time_format.js'
 
   export let pomodoroCountdown
   export let paused
