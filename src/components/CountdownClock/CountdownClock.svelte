@@ -1,10 +1,9 @@
 <script>
   import ProgressBar from 'progressbar.js';
-  import { tick } from 'svelte';
+  import { tick, createEventDispatcher } from 'svelte';
   import differenceInMilliseconds from 'date-fns/differenceInMilliseconds';
   import isBefore from 'date-fns/isBefore';
   import addMilliseconds from 'date-fns/addMilliseconds';
-  import { createEventDispatcher } from 'svelte';
   import { formatRemainingTime } from './utils';
 
   export let pomodoroCountdown;
@@ -56,7 +55,7 @@
         trailWidth: 1,
       });
     }
-    bar.animate(1, { duration }, () => dispatch('complete'), (erro) => { console.log(erro) });
+    bar.animate(1, { duration }, () => dispatch('complete'));
     updateCronometerInterval = setInterval(() => {
       bar.setText(formatRemainingTime(countdownTime));
     }, 50);
@@ -97,7 +96,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.5em;
+    font-size: 1.4em;
   }
 
   #countdown-timer-surround.hidden {

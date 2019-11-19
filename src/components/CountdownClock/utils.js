@@ -2,10 +2,14 @@ import differenceInMinutes from 'date-fns/differenceInMinutes';
 import differenceInSeconds from 'date-fns/differenceInSeconds';
 
 export function formatRemainingTime(countdownTime) {
-  const now = new Date();
-  const minutesDifference = differenceInMinutes(countdownTime, now);
-  const secondsDifference = differenceInSeconds(countdownTime, now);
-  return `${secondsDifference < 0 ? '- ' : ''}${formatNumberToTwoDigits(Math.abs(minutesDifference))}:${formatNumberToTwoDigits(Math.abs(secondsDifference % 60))}`;
+  const secondsDifference = differenceInSeconds(countdownTime, new Date());
+  const hours = Math.floor(Math.abs(secondsDifference) / 3600);
+  const minutes = Math.floor((Math.abs(secondsDifference) % 3600) / 60);
+  const seconds = (Math.abs(secondsDifference) % 3600) % 60;
+  const formattedHours = formatNumberToTwoDigits(Math.abs(hours));
+  const formattedMinutes = formatNumberToTwoDigits(Math.abs(minutes));
+  const formattedSeconds = formatNumberToTwoDigits(Math.abs(seconds));
+  return `${secondsDifference < 0 ? '- ' : ''}${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 }
 
 export function formatNumberToTwoDigits(number) {
