@@ -1,6 +1,8 @@
 <script>
-  import Main from './components/Main/Main.svelte';
-  import Modal from './components/Modal/Modal.svelte';
+  import Main from './components/Main/Main.svelte'
+  import Modal from './components/Modal/Modal.svelte'
 </script>
 
-<Modal closeButton={false}><Main /></Modal>
+<Modal closeButton={false}>
+  <Main />
+</Modal>

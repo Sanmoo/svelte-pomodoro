@@ -1,63 +1,71 @@
 <script>
-  import { setContext as baseSetContext } from 'svelte';
-  import { fade } from 'svelte/transition';
-  export let key = 'simple-modal';
-  export let closeButton = true;
-  export let closeOnEsc = true;
-  export let closeOnOuterClick = true;
-  export let transitionBg = fade;
-  export let transitionBgProps = { duration: 250 };
-  export let transitionWindow = transitionBg;
-  export let transitionWindowProps = transitionBgProps;
-  export let styleBg = {};
-  export let styleWindow = {};
-  export let styleContent = {};
-  export let setContext = baseSetContext;
-  let Component = null;
-  let props = null;
-  let background;
-  let wrap;
-  let customStyleBg = {};
-  let customStyleWindow = {};
-  let customStyleContent = {};
-  const camelCaseToDash = str => str
-    .replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
-  const toCssString = (props) => Object.keys(props)
-    .reduce((str, key) => `${str}; ${camelCaseToDash(key)}: ${props[key]}`, '');
-  $: cssBg = toCssString(Object.assign({}, styleBg, customStyleBg));
-  $: cssWindow = toCssString(Object.assign({}, styleWindow, customStyleWindow));
-  $: cssContent = toCssString(Object.assign({}, styleContent, customStyleContent));
-  const open = (NewComponent, newProps = {}, style = {bg: {}, window: {}, content: {}}) => {
-    Component = NewComponent;
-    props = newProps;
-    customStyleBg = style.bg || {};
-    customStyleWindow = style.window || {};
-    customStyleContent = style.content || {};
-  };
+  import { setContext as baseSetContext } from 'svelte'
+  import { fade } from 'svelte/transition'
+  export let key = 'simple-modal'
+  export let closeButton = true
+  export let closeOnEsc = true
+  export let closeOnOuterClick = true
+  export let transitionBg = fade
+  export let transitionBgProps = { duration: 250 }
+  export let transitionWindow = transitionBg
+  export let transitionWindowProps = transitionBgProps
+  export let styleBg = {}
+  export let styleWindow = {}
+  export let styleContent = {}
+  export let setContext = baseSetContext
+  let Component = null
+  let props = null
+  let background
+  let wrap
+  let customStyleBg = {}
+  let customStyleWindow = {}
+  let customStyleContent = {}
+  const camelCaseToDash = str =>
+    str.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase()
+  const toCssString = props =>
+    Object.keys(props).reduce(
+      (str, key) => `${str}; ${camelCaseToDash(key)}: ${props[key]}`,
+      ''
+    )
+  $: cssBg = toCssString(Object.assign({}, styleBg, customStyleBg))
+  $: cssWindow = toCssString(Object.assign({}, styleWindow, customStyleWindow))
+  $: cssContent = toCssString(
+    Object.assign({}, styleContent, customStyleContent)
+  )
+  const open = (
+    NewComponent,
+    newProps = {},
+    style = { bg: {}, window: {}, content: {} }
+  ) => {
+    Component = NewComponent
+    props = newProps
+    customStyleBg = style.bg || {}
+    customStyleWindow = style.window || {}
+    customStyleContent = style.content || {}
+  }
   const close = () => {
-    Component = null;
-    props = null;
-    customStyleBg = {};
-    customStyleWindow = {};
-    customStyleContent = {};
-  };
+    Component = null
+    props = null
+    customStyleBg = {}
+    customStyleWindow = {}
+    customStyleContent = {}
+  }
   const handleKeyup = ({ key }) => {
     if (closeOnEsc && Component && key === 'Escape') {
-      event.preventDefault();
-      close();
+      event.preventDefault()
+      close()
     }
-  };
-  const handleOuterClick = (event) => {
+  }
+  const handleOuterClick = event => {
     if (
-      closeOnOuterClick && (
-        event.target === background || event.target === wrap
-      )
+      closeOnOuterClick &&
+      (event.target === background || event.target === wrap)
     ) {
-      event.preventDefault();
-      close();
+      event.preventDefault()
+      close()
     }
-  };
-  setContext(key, { open, close });
+  }
+  setContext(key, { open, close })
 </script>
 
 <style>
@@ -114,10 +122,11 @@
     background: white;
     box-shadow: 0 0 0 1px black;
     transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-                background 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      background 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
     -webkit-appearance: none;
   }
-  .close:before, .close:after {
+  .close:before,
+  .close:after {
     content: '';
     display: block;
     box-sizing: border-box;
@@ -128,7 +137,7 @@
     background: black;
     transform-origin: center;
     transition: height 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-                background 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      background 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
   .close:before {
     -webkit-transform: translate(0, -50%) rotate(45deg);
@@ -145,7 +154,8 @@
   .close:hover {
     background: black;
   }
-  .close:hover:before, .close:hover:after {
+  .close:hover:before,
+  .close:hover:after {
     height: 2px;
     background: white;
   }
@@ -156,7 +166,9 @@
   .close:active {
     transform: scale(0.9);
   }
-  .close:hover, .close:focus, .close:active {
+  .close:hover,
+  .close:focus,
+  .close:active {
     outline: none;
   }
 
@@ -165,7 +177,7 @@
   }
 </style>
 
-<svelte:window on:keyup={handleKeyup}/>
+<svelte:window on:keyup={handleKeyup} />
 
 <div id="svelte-pomodoro-modal-container">
   {#if Component}
@@ -174,23 +186,21 @@
       on:click={handleOuterClick}
       bind:this={background}
       transition:transitionBg={transitionBgProps}
-      style={cssBg}
-    >
+      style={cssBg}>
       <div class="window-wrap" bind:this={wrap}>
         <div
           class="window"
           transition:transitionWindow={transitionWindowProps}
-          style={cssWindow}
-        >
+          style={cssWindow}>
           {#if closeButton}
-            <button on:click={close} class="close"></button>
+            <button on:click={close} class="close" />
           {/if}
           <div class="content" style={cssContent}>
-            <Component {...props}/>
+            <Component {...props} />
           </div>
         </div>
       </div>
     </div>
   {/if}
-  <slot></slot>
+  <slot />
 </div>
