@@ -1,27 +1,16 @@
-*Psst — looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+# Introduction
 
----
-
-# svelte app
-
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
-
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
-
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
-
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
+This is going to be simple pomodoro App, built with the [Svelte](https://svelte.dev/) framework.\
+Even though there are a lot of pomodoro apps out there, none of them seem to fit my UX needs. \
+Also, I have been using "dynamic pomodoros" for some time and it looks like there are no easy to find tools that support it. A call it dynamic pomodoros because it does not use pomodoros with fixed size. You can work on your tasks until you decide to make a break. The break times (short or long) are then calculated proportionally to the time you spent working. This is useful if you are in the middle of a task and you are very concentrated and you don't want to stop doing it just because your preconfigured pomodoro time is up. (Disclaimer: This techique has no scientific basis that I know).\
+Also, I wanted to practicize some Svelte 😆 
 
 ## Get started
 
 Install the dependencies...
 
 ```bash
-cd svelte-app
+cd svelte-pomodoro
 npm install
 ```
 
@@ -31,41 +20,7 @@ npm install
 npm run dev
 ```
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+The app will then be available at http://localhost:5000.
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
-
-
-## Deploying to the web
-
-### With [now](https://zeit.co/now)
-
-Install `now` if you haven't already:
-
-```bash
-npm install -g now
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-now
-```
-
-As an alternative, use the [Now desktop client](https://zeit.co/download) and simply drag the unzipped project folder to the taskbar icon.
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public
-```
+## Next dev steps
+TODO
