@@ -10,7 +10,7 @@
       } else if (Notification.permission === 'granted') {
         console.log(Notification.permission)
         return resolve(true)
-      } else if (Notification.permission === 'denied') {
+      } else {
         Notification.requestPermission(permission => {
           console.log('Requested and got:', Notification.permission)
           return resolve(permission === 'granted')
