@@ -2,7 +2,7 @@
   import settings from '../../stores/settings.js'
   import addSeconds from 'date-fns/addSeconds'
   import differenceInSeconds from 'date-fns/differenceInSeconds'
-  import { tick, onMount, getContext } from 'svelte'
+  import { tick, getContext } from 'svelte'
   import { fade } from 'svelte/transition'
   import Settings from '../Settings/Settings.svelte'
   import CountdownClock from '../CountdownClock/CountdownClock.svelte'
@@ -52,27 +52,7 @@
     return minutes * 60
   }
 
-  function requestNotificationPermission() {
-    return new Promise(resolve => {
-      if (!('Notification' in window)) {
-        alert('This browser does not support notifications')
-        return resolve(false)
-      } else if (Notification.permission === 'granted') {
-        return resolve(true)
-      } else if (Notification.permission === 'denied') {
-        Notification.requestPermission(permission => {
-          return resolve(permission === 'granted')
-        })
-      }
-      return resolve(false)
-    })
-  }
-
   async function startCycle(cycleType) {
-    if (cycleType === 'work') {
-      await requestNotificationPermission()
-    }
-
     pomoCycleType = cycleType
     pomoCycleCompleted = false
     if ($settings.enableDynamicPomos && cycleType === 'work') {

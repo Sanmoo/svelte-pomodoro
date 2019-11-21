@@ -1,5 +1,26 @@
 <script>
   import settings from '../../stores/settings.js'
+
+  function requestNotificationPermission() {
+    return new Promise(resolve => {
+      if (!('Notification' in window)) {
+        alert('This browser does not support notifications')
+        console.log('unsupported')
+        return resolve(false)
+      } else if (Notification.permission === 'granted') {
+        console.log(Notification.permission)
+        return resolve(true)
+      } else if (Notification.permission === 'denied') {
+        Notification.requestPermission(permission => {
+          console.log('Requested and got:', Notification.permission)
+          return resolve(permission === 'granted')
+        })
+        return
+      }
+      console.log(Notification.permission)
+      return resolve(false)
+    })
+  }
 </script>
 
 <style>
@@ -16,12 +37,23 @@
   div.dynamic-options {
     margin-top: 1em;
   }
+
+  a:hover {
+    cursor: pointer;
+  }
+
+  div.actions {
+    margin-bottom: 0.6em;
+  }
 </style>
 
 <div>
   <h2>Your Settings</h2>
   <form>
     <div class="traditional-options">
+      <div class="actions">
+        <a on:click={requestNotificationPermission}>Enable Alerts</a>
+      </div>
       <div class="form-field-group">
         <label for="workTime">Work Duration</label>
         <div class="form-field-input">
